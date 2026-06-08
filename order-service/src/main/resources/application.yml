@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: order-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5433/${ORDER_POSTGRES_DB}}
+    username: ${SPRING_DATASOURCE_USERNAME:${ORDER_POSTGRES_USER}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${ORDER_POSTGRES_PASSWORD}}
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:http://localhost:8081/realms/car-app}
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+
+server:
+  port: 8080
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    oauth:
+      client-id: backend
+      use-pkce-with-authorization-code-grant: false
+
+  oauthflow:
+    authorization-url: http://localhost:8081/realms/car-app/protocol/openid-connect/auth
+    token-url: http://localhost:8081/realms/car-app/protocol/openid-connect/token
+
+app:
+  outbox:
+    publish-delay-ms: 5000
+    max-attempts: 5
+
+storage:
+  grpc:
+    host: ${STORAGE_GRPC_HOST:localhost}
+    port: ${STORAGE_GRPC_PORT:9090}
+    timeout-ms: ${STORAGE_GRPC_TIMEOUT_MS:3000}

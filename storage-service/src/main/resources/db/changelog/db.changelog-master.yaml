@@ -1,0 +1,388 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-assembly-orders
+      author: sergey
+      changes:
+        - createTable:
+            tableName: assembly_orders
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: source_order_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: source_order_type
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: car_id
+                  type: uuid
+              - column:
+                  name: model_id
+                  type: uuid
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: warehouse_admin_id
+                  type: uuid
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: assembly_order_required_components
+            columns:
+              - column:
+                  name: assembly_order_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: component_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: assembly_order_required_components
+            baseColumnNames: assembly_order_id
+            referencedTableName: assembly_orders
+            referencedColumnNames: id
+            constraintName: fk_assembly_components_order
+
+  - changeSet:
+      id: 002-create-processed-messages
+      author: sergey
+      changes:
+        - createTable:
+            tableName: processed_messages
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: event_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: event_type
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: consumer_name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: processed_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: processed_messages
+            columnNames: event_id, consumer_name
+            constraintName: uk_storage_processed_messages_event_consumer
+
+  - changeSet:
+      id: 003-create-outbox-events
+      author: sergey
+      changes:
+        - createTable:
+            tableName: outbox_events
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: event_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: event_type
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: aggregate_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: payload
+                  type: text
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: published_at
+                  type: timestamp with time zone
+              - column:
+                  name: attempts
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_error
+                  type: text
+
+        - createIndex:
+            tableName: outbox_events
+            indexName: idx_storage_outbox_events_unpublished
+            columns:
+              - column:
+                  name: published_at
+              - column:
+                  name: created_at
+
+  - changeSet:
+      id: 004-create-storage-inventory
+      author: sergey
+      changes:
+        - createTable:
+            tableName: storage_cars
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: model_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: vin
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - createTable:
+            tableName: storage_components
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: component_option_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: quantity
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reserved_quantity
+                  type: int
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+
+        - insert:
+            tableName: storage_cars
+            columns:
+              - column:
+                  name: id
+                  value: "55555555-5555-5555-5555-555555555555"
+              - column:
+                  name: model_id
+                  value: "33333333-3333-3333-3333-333333333333"
+              - column:
+                  name: vin
+                  value: "WBATEST00000000001"
+              - column:
+                  name: status
+                  value: "AVAILABLE"
+              - column:
+                  name: created_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: updated_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: removed
+                  valueBoolean: false
+
+        - insert:
+            tableName: storage_components
+            columns:
+              - column:
+                  name: id
+                  value: "77777777-7777-7777-7777-777777777771"
+              - column:
+                  name: component_option_id
+                  value: "44444444-4444-4444-4444-444444444441"
+              - column:
+                  name: quantity
+                  valueNumeric: 10
+              - column:
+                  name: reserved_quantity
+                  valueNumeric: 0
+              - column:
+                  name: created_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: updated_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: removed
+                  valueBoolean: false
+
+        - insert:
+            tableName: storage_components
+            columns:
+              - column:
+                  name: id
+                  value: "77777777-7777-7777-7777-777777777772"
+              - column:
+                  name: component_option_id
+                  value: "44444444-4444-4444-4444-444444444442"
+              - column:
+                  name: quantity
+                  valueNumeric: 10
+              - column:
+                  name: reserved_quantity
+                  valueNumeric: 0
+              - column:
+                  name: created_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: updated_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: removed
+                  valueBoolean: false
+
+        - insert:
+            tableName: storage_components
+            columns:
+              - column:
+                  name: id
+                  value: "77777777-7777-7777-7777-777777777773"
+              - column:
+                  name: component_option_id
+                  value: "44444444-4444-4444-4444-444444444443"
+              - column:
+                  name: quantity
+                  valueNumeric: 10
+              - column:
+                  name: reserved_quantity
+                  valueNumeric: 0
+              - column:
+                  name: created_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: updated_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: removed
+                  valueBoolean: false
+
+        - insert:
+            tableName: storage_components
+            columns:
+              - column:
+                  name: id
+                  value: "77777777-7777-7777-7777-777777777774"
+              - column:
+                  name: component_option_id
+                  value: "44444444-4444-4444-4444-444444444444"
+              - column:
+                  name: quantity
+                  valueNumeric: 10
+              - column:
+                  name: reserved_quantity
+                  valueNumeric: 0
+              - column:
+                  name: created_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: updated_at
+                  value: "2026-01-01T00:00:00Z"
+              - column:
+                  name: removed
+                  valueBoolean: false

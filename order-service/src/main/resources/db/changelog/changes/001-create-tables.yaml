@@ -1,0 +1,497 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-users
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: users
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 002-create-car-models
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: car_models
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: brand
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: "NUMERIC(19,2)"
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 003-create-car-model-required-components
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: car_model_required_components
+            columns:
+              - column:
+                  name: car_model_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: component_type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: car_model_required_components
+            baseColumnNames: car_model_id
+            referencedTableName: car_models
+            referencedColumnNames: id
+            constraintName: fk_required_components_car_model
+
+  - changeSet:
+      id: 004-create-component-options
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: component_options
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price_delta
+                  type: "NUMERIC(19,2)"
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 005-create-component-option-compatible-models
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: component_option_compatible_models
+            columns:
+              - column:
+                  name: component_option_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: car_model_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: component_option_compatible_models
+            baseColumnNames: component_option_id
+            referencedTableName: component_options
+            referencedColumnNames: id
+            constraintName: fk_component_option_compatible_models_option
+
+  - changeSet:
+      id: 006-create-cars
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: cars
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: model_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: brand
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: model_name
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: price
+                  type: "NUMERIC(19,2)"
+              - column:
+                  name: body_type
+                  type: VARCHAR(50)
+              - column:
+                  name: fuel_type
+                  type: VARCHAR(50)
+              - column:
+                  name: engine_power_hp
+                  type: INTEGER
+              - column:
+                  name: engine_volume
+                  type: "NUMERIC(10,2)"
+              - column:
+                  name: transmission_type
+                  type: VARCHAR(50)
+              - column:
+                  name: drive_type
+                  type: VARCHAR(50)
+              - column:
+                  name: color
+                  type: VARCHAR(50)
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: cars
+            baseColumnNames: model_id
+            referencedTableName: car_models
+            referencedColumnNames: id
+            constraintName: fk_cars_model
+
+  - changeSet:
+      id: 007-create-test-drive-cars
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: test_drive_cars
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: car_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: test_drive_cars
+            baseColumnNames: car_id
+            referencedTableName: cars
+            referencedColumnNames: id
+            constraintName: fk_test_drive_cars_car
+
+  - changeSet:
+      id: 008-create-test-drive-requests
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: test_drive_requests
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: client_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: car_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: start_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: test_drive_requests
+            baseColumnNames: car_id
+            referencedTableName: cars
+            referencedColumnNames: id
+            constraintName: fk_test_drive_requests_car
+
+  - changeSet:
+      id: 009-create-stock-orders
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: stock_orders
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: client_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: manager_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: car_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 010-create-custom-orders
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: custom_orders
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: client_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: manager_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: model_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: configuration_price
+                  type: "NUMERIC(19,2)"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 011-create-custom-order-selected-options
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: custom_order_selected_options
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: "TIMESTAMP WITH TIME ZONE"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: removed
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: custom_order_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: component_type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: component_option_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: custom_order_selected_options
+            baseColumnNames: custom_order_id
+            referencedTableName: custom_orders
+            referencedColumnNames: id
+            constraintName: fk_custom_order_selected_options_order

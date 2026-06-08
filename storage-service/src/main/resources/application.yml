@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: storage-service
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5434/${STORAGE_POSTGRES_DB}}
+    username: ${SPRING_DATASOURCE_USERNAME:${STORAGE_POSTGRES_USER}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${STORAGE_POSTGRES_PASSWORD}}
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: false
+
+  liquibase:
+    enabled: true
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI:http://localhost:8081/realms/car-app}
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:29092}
+
+  grpc:
+    server:
+      port: ${SPRING_GRPC_SERVER_PORT:9090}
+      keep-alive:
+        time: 2h
+        timeout: 20s
+        permit-time: 5m
+        max-idle: 30m
+        max-age: 2h
+        max-age-grace: 20s
+
+server:
+  port: 8082
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    oauth:
+      client-id: backend
+      use-pkce-with-authorization-code-grant: false
+
+  oauthflow:
+    authorization-url: http://localhost:8081/realms/car-app/protocol/openid-connect/auth
+    token-url: http://localhost:8081/realms/car-app/protocol/openid-connect/token
+
+app:
+  outbox:
+    publish-delay-ms: 5000
+    max-attempts: 5

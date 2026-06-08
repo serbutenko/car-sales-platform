@@ -1,0 +1,106 @@
+services:
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    container_name: order-service
+    environment:
+      ORDER_POSTGRES_DB: ${ORDER_POSTGRES_DB}
+      ORDER_POSTGRES_USER: ${ORDER_POSTGRES_USER}
+      ORDER_POSTGRES_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://order-postgres:5432/${ORDER_POSTGRES_DB}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/car-app
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      STORAGE_GRPC_HOST: storage-service
+      STORAGE_GRPC_PORT: 9090
+    ports:
+      - "8080:8080"
+    depends_on:
+      - order-postgres
+      - keycloak
+      - kafka
+      - storage-service
+
+  storage-service:
+    build:
+      context: .
+      dockerfile: storage-service/Dockerfile
+    container_name: storage-service
+    environment:
+      STORAGE_POSTGRES_DB: ${STORAGE_POSTGRES_DB}
+      STORAGE_POSTGRES_USER: ${STORAGE_POSTGRES_USER}
+      STORAGE_POSTGRES_PASSWORD: ${STORAGE_POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://storage-postgres:5432/${STORAGE_POSTGRES_DB}
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8080/realms/car-app
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    ports:
+      - "8082:8082"
+      - "9090:9090"
+    depends_on:
+      - storage-postgres
+      - keycloak
+      - kafka
+
+  order-postgres:
+    image: postgres:17
+    container_name: order-postgres
+    environment:
+      POSTGRES_DB: ${ORDER_POSTGRES_DB}
+      POSTGRES_USER: ${ORDER_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${ORDER_POSTGRES_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - order_postgres_data:/var/lib/postgresql/data
+
+  storage-postgres:
+    image: postgres:17
+    container_name: storage-postgres
+    environment:
+      POSTGRES_DB: ${STORAGE_POSTGRES_DB}
+      POSTGRES_USER: ${STORAGE_POSTGRES_USER}
+      POSTGRES_PASSWORD: ${STORAGE_POSTGRES_PASSWORD}
+    ports:
+      - "5434:5432"
+    volumes:
+      - storage_postgres_data:/var/lib/postgresql/data
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.5
+    command: start-dev --import-realm
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - "8081:8080"
+    volumes:
+      - ./realm-config.json:/opt/keycloak/data/import/realm-config.json
+
+  zookeeper:
+    image: zookeeper:3.9.5
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: kafka
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    ports:
+      - "29092:29092"
+    depends_on:
+      - zookeeper
+
+volumes:
+  order_postgres_data:
+  storage_postgres_data:

@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004-create-processed-messages
+      author: sergey-butenko
+      changes:
+        - createTable:
+            tableName: processed_messages
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: event_id
+                  type: uuid
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: event_type
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: consumer_name
+                  type: varchar(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: processed_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: processed_messages
+            columnNames: event_id, consumer_name
+            constraintName: uk_processed_messages_event_consumer

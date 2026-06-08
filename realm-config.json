@@ -1,0 +1,139 @@
+{
+  "realm": "car-app",
+  "enabled": true,
+  "verifyEmail": false,
+  "registrationAllowed": false,
+  "resetPasswordAllowed": false,
+  "rememberMe": false,
+  "clients": [
+    {
+      "clientId": "backend",
+      "enabled": true,
+      "publicClient": true,
+      "directAccessGrantsEnabled": true,
+      "standardFlowEnabled": true,
+      "serviceAccountsEnabled": false,
+      "redirectUris": [
+        "http://localhost:8080/*",
+        "http://localhost:8082/*"
+      ],
+      "webOrigins": [
+        "http://localhost:8080",
+        "http://localhost:8082"
+      ]
+    }
+  ],
+  "roles": {
+    "realm": [
+      {
+        "name": "USER"
+      },
+      {
+        "name": "MANAGER"
+      },
+      {
+        "name": "WAREHOUSE_ADMIN"
+      },
+      {
+        "name": "ADMIN"
+      }
+    ]
+  },
+  "users": [
+    {
+      "username": "client1",
+      "enabled": true,
+      "email": "client1@example.com",
+      "emailVerified": true,
+      "firstName": "Client",
+      "lastName": "One",
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    },
+    {
+      "username": "client2",
+      "enabled": true,
+      "email": "client2@example.com",
+      "emailVerified": true,
+      "firstName": "Client",
+      "lastName": "Two",
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "USER"
+      ]
+    },
+    {
+      "username": "manager1",
+      "enabled": true,
+      "email": "manager1@example.com",
+      "emailVerified": true,
+      "firstName": "Manager",
+      "lastName": "One",
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "MANAGER"
+      ]
+    },
+    {
+      "username": "admin1",
+      "enabled": true,
+      "email": "admin1@example.com",
+      "emailVerified": true,
+      "firstName": "Admin",
+      "lastName": "One",
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "ADMIN"
+      ]
+    },
+    {
+      "username": "warehouse_admin1",
+      "enabled": true,
+      "email": "warehouse_admin1@example.com",
+      "emailVerified": true,
+      "firstName": "Warehouse",
+      "lastName": "Admin",
+      "requiredActions": [],
+      "credentials": [
+        {
+          "type": "password",
+          "value": "1234",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "WAREHOUSE_ADMIN"
+      ]
+    }
+  ]
+}
